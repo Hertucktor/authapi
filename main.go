@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "github.com/Hertucktor/authapi/api"
 
+func main() {
+	api.SetupRoutes()
 }
