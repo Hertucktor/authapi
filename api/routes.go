@@ -10,7 +10,7 @@ func SetupRoutes() {
 
 	router := gin.Default()
 
-	router.GET("/user/:name", func(c *gin.Context) {
+	router.GET("/status", func(c *gin.Context) {
 		c.String(http.StatusOK, "Hello, wir sind live!")
 	})
 
