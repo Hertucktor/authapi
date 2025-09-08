@@ -51,5 +51,9 @@ func InitDB() {
 }
 
 func GetCollection(collectionName string) *mongo.Collection {
-	return Client.Database(DatabaseName).Collection(collectionName)
+	collection := Client.Database(DatabaseName).Collection(collectionName)
+	if collection == nil {
+		log.Fatal("Collection couldn't be found")
+	}
+	return collection
 }

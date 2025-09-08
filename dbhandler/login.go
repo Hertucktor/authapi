@@ -23,6 +23,8 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
+	userCollection := GetCollection(UserCollection)
+
 	// find user in db
 	var user User
 	err := userCollection.FindOne(ctx, bson.M{"username": credentials.Username}).Decode(&user)
