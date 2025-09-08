@@ -18,12 +18,12 @@ func RegisterUser(c *gin.Context) {
 	defer cancel()
 
 	var user User
-
+	// bind JSON Data
 	if err := c.BindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	// check if user already exists
 	var existingUser User
 	err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&existingUser)
 	if err == nil {
@@ -36,13 +36,13 @@ func RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusConflict, gin.H{"error": "Benutzername bereits vergeben"})
 		return
 	}
-
+	// hash password
 	hashedPassword, err := HashPassword(user.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Fehler beim Verschlüsseln des Passworts"})
 		return
 	}
-
+	// prepare new user object
 	newUser := User{
 		ID:        primitive.NewObjectID(),
 		Name:      user.Name,
@@ -53,13 +53,13 @@ func RegisterUser(c *gin.Context) {
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-
+	// safe user in db
 	result, err := userCollection.InsertOne(ctx, newUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Fehler beim Speichern des Benutzers"})
 		return
 	}
-
+	// success message
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Benutzer erfolgreich registriert",
 		"userId":  result.InsertedID,
