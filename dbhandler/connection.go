@@ -23,7 +23,7 @@ type User struct {
 }
 
 const (
-	ConnectionString = "mongodb://localhost:27017"
+	ConnectionString = "mongodb://mongo:27017"
 	DatabaseName     = "userdb"
 	UserCollection   = "users"
 )
