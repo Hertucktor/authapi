@@ -1,8 +1,9 @@
 package api
 
 import (
-	"net/http"
+	"log"
 
+	"github.com/Hertucktor/authapi/dbhandler"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,12 +11,13 @@ func SetupRoutes() {
 
 	router := gin.Default()
 
-	router.GET("/user/:name", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello, wir sind live!")
-	})
+	router.GET("/status", getStatus)
+	// router.Get("/health", getHealth) for Overall health stats on the db
+	// router.Get("/metrics", getMetrics) Uptime, Resource Usage etc.
+	router.POST("/register", dbhandler.RegisterUser)
+	router.POST("/login", dbhandler.LoginUser)
 
-	// By default, it serves on :8080 unless a
-	// PORT environment variable was defined.
-	router.Run()
-	// router.Run(":3000") for a hard coded port
+	if err := router.Run(":8080"); err != nil {
+		log.Fatal("Server konnte nicht gestartet werden: ", err)
+	}
 }
