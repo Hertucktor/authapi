@@ -15,17 +15,19 @@ type User struct {
 	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	Name      string             `json:"name" bson:"name" binding:"required"`
 	Email     string             `json:"email" bson:"email" binding:"required"`
-	Phone     string             `json:"phone" bson:"phone,omitempty"`
+	Phone     *string            `json:"phone,omitempty" bson:"phone,omitempty"`
 	Username  string             `json:"username" bson:"username" binding:"required,min=1,max=30"`
-	Password  string             `json:"passwortd" bson:"password" bindign:"required,min=15"`
+	Password  string             `json:"password" bson:"password" binding:"required,min=15"`
 	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
 	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at"`
 }
 
 const (
+	//TODO: import data via env
 	ConnectionString = "mongodb://mongo:27017"
-	DatabaseName     = "userdb"
-	UserCollection   = "users"
+	//ConnectionString = "mongodb://localhost:27017"
+	DatabaseName   = "userdb"
+	UserCollection = "users"
 )
 
 var Client *mongo.Client

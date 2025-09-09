@@ -29,13 +29,13 @@ func LoginUser(c *gin.Context) {
 	var user User
 	err := userCollection.FindOne(ctx, bson.M{"username": credentials.Username}).Decode(&user)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Ungültige Anmeldedaten"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User name couldn't be found"})
 		return
 	}
 
 	// check password
 	if !CheckPasswordHash(user.Password, credentials.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Ungültige Anmeldedaten"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Password is not correct"})
 		return
 	}
 
