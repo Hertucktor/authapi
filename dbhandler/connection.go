@@ -48,10 +48,18 @@ func GetCollection(collectionName string) *mongo.Collection {
 }
 
 func loadEnv() {
-	err := godotenv.Load(os.Getenv("ENV_FILE"))
-	if err != nil {
-		log.Fatal("Error loading env file, '${ENV_FILE} Variable not set'")
+	envFile := os.Getenv("ENV_FILE")
+	if envFile == "" {
+		envFile = ".env.prod"
+		log.Printf("ENV_FILE not set, using default: %s", envFile)
 	}
+
+	err := godotenv.Load(envFile)
+	if err != nil {
+		log.Fatalf("Error loading env file '%s': %v", envFile, err)
+	}
+
+	log.Printf("Successfully loaded environment from %s", envFile)
 }
 
 func createDBConnectionURI() string {
