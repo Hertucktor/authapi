@@ -6,4 +6,7 @@
 - /login -> login with existing user data
 
 ## How to start docker container (with their respectable env file)
-- docker compose (--env file .env.dev | .env.prod) up
+localhost development:
+- docker compose --env-file .env.dev up
+docker environment:
+- docker compose --env-file .env.prod up

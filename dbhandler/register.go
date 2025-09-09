@@ -44,7 +44,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	userCollection := GetCollection(UserCollection)
+	userCollection := GetCollection(GetUserCollection())
 
 	// check if user already exists
 	var existingUser user
