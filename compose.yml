@@ -7,6 +7,10 @@ services:
     ports:
       - '8080:8080'
     restart: unless-stopped
+    networks:
+      - api-network
+    depends_on:
+      - mongo
   mongo:
     image: mongo:8.0.14-rc0-noble
     container_name: mongo_db
@@ -15,7 +19,13 @@ services:
       - '27017:27017'
     volumes:
       - mongo-data:/data/db
+    networks:
+      - api-network
 
 volumes:
   mongo-data:
     driver: local
+
+networks:
+  api-network:
+    driver: bridge

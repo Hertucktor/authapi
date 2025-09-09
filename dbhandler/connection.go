@@ -4,37 +4,26 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-)
-
-type User struct {
-	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Name      string             `json:"name" bson:"name" binding:"required"`
-	Email     string             `json:"email" bson:"email" binding:"required"`
-	Phone     string             `json:"phone" bson:"phone,omitempty"`
-	Username  string             `json:"username" bson:"username" binding:"required,min=1,max=30"`
-	Password  string             `json:"passwortd" bson:"password" bindign:"required,min=15"`
-	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at"`
-}
-
-const (
-	ConnectionString = "mongodb://localhost:27017"
-	DatabaseName     = "userdb"
-	UserCollection   = "users"
 )
 
 var Client *mongo.Client
 
 func InitDB() {
+	// make env vars accessable
+	loadEnv()
+	// create DB URI
+	connectionString := createDBConnectionURI()
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	clientOptions := options.Client().ApplyURI(ConnectionString)
+	clientOptions := options.Client().ApplyURI(connectionString)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -51,9 +40,39 @@ func InitDB() {
 }
 
 func GetCollection(collectionName string) *mongo.Collection {
-	collection := Client.Database(DatabaseName).Collection(collectionName)
+	collection := Client.Database(getDBName()).Collection(collectionName)
 	if collection == nil {
 		log.Fatal("Collection couldn't be found")
 	}
 	return collection
+}
+
+func loadEnv() {
+	envFile := os.Getenv("ENV_FILE")
+	if envFile == "" {
+		envFile = ".env.prod"
+		log.Printf("ENV_FILE not set, using default: %s", envFile)
+	}
+
+	err := godotenv.Load(envFile)
+	if err != nil {
+		log.Fatalf("Error loading env file '%s': %v", envFile, err)
+	}
+
+	log.Printf("Successfully loaded environment from %s", envFile)
+}
+
+func createDBConnectionURI() string {
+	result := fmt.Sprintf("%s://%s:%s", os.Getenv("DB_SCHEME"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"))
+	return result
+}
+
+func getDBName() string {
+	userDBName := os.Getenv("DB_NAME_USER")
+	return userDBName
+}
+
+func GetUserCollection() string {
+	userCollection := os.Getenv("DB_USER_COLLECTION")
+	return userCollection
 }

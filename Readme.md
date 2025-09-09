@@ -2,7 +2,11 @@
 
 ## How the routes are laid out
 - /status -> show current status of app
+- /register -> register a user
+- /login -> login with existing user data
 
-## How to start docker container
-- docker build .
-- docker run -p 8080:8080 <image-ref>
+## How to start docker container (with their respectable env file)
+localhost development:
+- docker compose --env-file .env.dev up
+docker environment:
+- docker compose --env-file .env.prod up
