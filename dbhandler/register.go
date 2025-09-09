@@ -10,13 +10,36 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type registerUserRequest struct {
+	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Name      string             `json:"name" bson:"name" binding:"required"`
+	Email     string             `json:"email" bson:"email" binding:"required"`
+	Phone     *string            `json:"phone,omitempty" bson:"phone,omitempty"`
+	Username  string             `json:"username" bson:"username" binding:"required,min=1,max=30"`
+	Password  string             `json:"password" bson:"password" binding:"required,min=15"`
+	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
+	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at"`
+}
+
+type user struct {
+	ID        primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Name      string             `json:"name" bson:"name" binding:"required"`
+	Email     string             `json:"email" bson:"email" binding:"required"`
+	Phone     *string            `json:"phone,omitempty" bson:"phone,omitempty"`
+	Username  string             `json:"username" bson:"username" binding:"required,min=1,max=30"`
+	Password  string             `json:"password" bson:"password" binding:"required,min=15"`
+	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
+	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at"`
+}
+
 func RegisterUser(c *gin.Context) {
+	var reqisterUser registerUserRequest
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var user User
 	// bind JSON
-	if err := c.BindJSON(&user); err != nil {
+	if err := c.BindJSON(&reqisterUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -24,31 +47,31 @@ func RegisterUser(c *gin.Context) {
 	userCollection := GetCollection(UserCollection)
 
 	// check if user already exists
-	var existingUser User
-	err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&existingUser)
+	var existingUser user
+	err := userCollection.FindOne(ctx, bson.M{"email": reqisterUser.Email}).Decode(&existingUser)
 	if err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Benutzer mit dieser E-Mail existiert bereits"})
 		return
 	}
 
-	err = userCollection.FindOne(ctx, bson.M{"username": user.Username}).Decode(&existingUser)
+	err = userCollection.FindOne(ctx, bson.M{"username": reqisterUser.Username}).Decode(&existingUser)
 	if err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Benutzername bereits vergeben"})
 		return
 	}
 	// hash password
-	hashedPassword, err := HashPassword(user.Password)
+	hashedPassword, err := HashPassword(reqisterUser.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Fehler beim Verschlüsseln des Passworts"})
 		return
 	}
 	// prepare new user object
-	newUser := User{
+	newUser := user{
 		ID:        primitive.NewObjectID(),
-		Name:      user.Name,
-		Email:     user.Email,
-		Phone:     user.Phone,
-		Username:  user.Username,
+		Name:      reqisterUser.Name,
+		Email:     reqisterUser.Email,
+		Phone:     reqisterUser.Phone,
+		Username:  reqisterUser.Username,
 		Password:  hashedPassword,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
