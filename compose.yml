@@ -1,4 +1,10 @@
 services:
+  gatekeeper:
+    build:
+      context: ./gatekeeper
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'
   unitycode-api:
     build:
       context: .
