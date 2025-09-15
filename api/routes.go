@@ -4,12 +4,15 @@ import (
 	"log"
 
 	"github.com/Hertucktor/authapi/dbhandler"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRoutes() {
 
 	router := gin.Default()
+
+	router.Use(cors.Default())
 
 	router.GET("/status", getStatus)
 	// router.Get("/health", getHealth) for Overall health stats on the db

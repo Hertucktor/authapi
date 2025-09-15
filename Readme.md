@@ -10,3 +10,6 @@ localhost development:
 - docker compose --env-file .env.dev up
 docker environment:
 - docker compose --env-file .env.prod up
+
+### Rebuild only one container from the docker compose
+- docker compose up -d --build <service-name>
